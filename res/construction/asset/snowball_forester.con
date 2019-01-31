@@ -1,0 +1,95 @@
+local forester = require "snowball_forester"
+
+local densities = {24, 36, 48, 64, 96, 128, 160}
+local modes = {"plan", "plant", "reset"}
+local types = {"all", "conifer", "broadleaf", "shrub"}
+
+function dump(o)
+    if type(o) == "table" then
+        local s = "{ "
+        for k, v in pairs(o) do
+            if type(k) ~= "number" then
+                k = '"' .. k .. '"'
+            end
+            s = s .. "[" .. k .. "] = " .. dump(v) .. ","
+        end
+        return s .. "} "
+    else
+        return tostring(o)
+    end
+end
+
+function data()
+	return {
+		type = "ASSET_DEFAULT",
+		buildMode = "MULTI",
+		categories = {"tree"},
+		availability = {
+			yearFrom = 0,
+			yearTo = 0
+		},
+		description = {
+			name = _("title"),
+			description = _("description")
+		},
+		order = 197720101,
+		skipCollision = true,
+		autoRemovable = true,
+		params = {
+			{
+				key = "mode",
+				name = _("mode"),
+				values = {_("plan"), _("plant"), _("reset")},
+				defaultIndex = 0
+			},
+			{
+				key = "density",
+				name = _("density"),
+				values = {"24", "36", "48", "64", "96", "128", "160"},
+				defaultIndex = 3
+			},
+			{
+				key = "type",
+				name = _("type"),
+				values = {_("all"), _("conifer"), _("broadleaf"), _("shrub")},
+				defaultIndex = 0
+			}
+		},
+		updateFn = function(params)
+			local result = {
+				models = {},
+				cost = 10,
+				bulldozeCost = 10,
+				maintenanceCost = 0
+			}
+			local mode = modes[params.mode + 1]
+			local density = densities[params.density + 1]
+			local type = types[params.type + 1]
+					
+			local terrain_pos = game.gui.getTerrainPos()
+			print("=======")
+			print(dump(terrain_pos))
+			result.models = {}
+
+			result.terrainAlignmentLists = {
+				{
+					type = "EQUAL",
+					faces = {}
+				}
+			}
+
+			if mode == "plan" then
+				forester.plan( result )
+			elseif mode == "reset" then
+				forester.reset( result )
+			elseif mode == "plant" then
+				forester.plant( result, density, type)
+				
+			else
+				error("Planter: invalid operation ", mode)
+			end
+
+			return result
+		end
+	}
+end

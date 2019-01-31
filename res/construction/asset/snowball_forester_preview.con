@@ -1,0 +1,58 @@
+function data() return { 
+	type = "ASSET_DEFAULT",
+	buildMode = "MULTI",
+	categories = { "tree" },
+	availability = {
+		yearFrom = 244,
+		yearTo = 245
+	},
+	description = {
+		name = _("patch_title"),
+		description =  _("patch_description"),
+	},	
+	order = 197720103,
+	skipCollision = true,
+	autoRemovable = false,	
+	params = {	},
+	updateFn = function(params)	
+		
+		local result = { 
+			models = {},
+			cost = 10,
+			bulldozeCost = 10,
+			maintenanceCost = 0  
+		}
+			
+		result.terrainAlignmentLists = { {
+			type = "EQUAL",
+			faces =  {},			
+		} }
+		
+		local outline = params.outline
+		
+		for i = 1, #outline do
+			result.models[#result.models+1] =
+			{					
+				id = "asset/snowball_forester_suspensor.mdl",
+				transf = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }
+			}
+		end
+				
+		result.groundFaces = { {  
+			face = outline,
+			modes = {
+			  {
+				type = "FILL",         
+				key = "snowball_forester_conifer"
+			  },
+			  {
+				type = "STROKE",         
+				key = "snowball_forester_conifer_border"
+			  }
+			}
+		  } }
+		
+		return result
+
+	end,
+} end
